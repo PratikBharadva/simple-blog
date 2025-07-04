@@ -1,7 +1,12 @@
-<<<<<<< HEAD
-# simple-crud
+# simple-blog-crud
 for learning node.js
-=======
-# simple-blog
-Made this repository to learn node.js
->>>>>>> 3153a1a922372392b1c7d9031f31a1b91da0b0a3
+
+### Thing I have learned
+1. basic user crud operation
+2. authentication using jwt
+3. access control for user
+4. pagination and sorting on fetch user route
+5. blog crud operation
+6. file handling for blog image in disk storage
+7. search operation on blog by title
+8. made wrapper function of try-catch for api controller
