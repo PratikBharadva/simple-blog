@@ -15,6 +15,7 @@ const {
   updateBlogImage,
   deleteBlog,
   searchBlog,
+  fetchBlogsPipeline
 } = require("../controllers/blogController");
 
 const router = express.Router();
@@ -26,7 +27,8 @@ router.post(
   upload.single("image"),
   createBlog
 );
-router.get("/", checkUserLogin, fetchBlogs);
+// router.get("/", checkUserLogin, fetchBlogs);
+router.get("/", fetchBlogsPipeline);
 router.get("/search", checkUserLogin, searchBlog);
 router.get("/:id", checkUserLogin, fetchOneBlog);
 router.get("/user/:userId", checkUserLogin, fetchBlogByUserId);

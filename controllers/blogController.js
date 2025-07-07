@@ -60,6 +60,67 @@ const fetchBlogs = asyncHandler(async (req, res) => {
   });
 });
 
+const fetchBlogsPipeline = asyncHandler(async (req, res) => {
+  let {query, page, limit, sortby} = req.query;
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 3;
+  const skip = (page - 1) * limit;
+  let pipeline = [];
+
+  if(query){
+    pipeline.push({
+      $search: {
+        index: "title",
+        text: {
+          query: query,
+          path: ["title"]
+        }
+      }
+    })
+  }
+
+  // lookup is like left-join & flatten author field
+  pipeline.push({
+    $lookup: {
+      from: "users", // collection name as per mongoDB
+      localField: "userId",
+      foreignField: "_id",
+      as: "author"
+    }
+  }, {
+    $unwind: "$author"
+  })
+
+  // sort by createAt date
+  if(sortby)
+  pipeline.push({
+    $sort: {
+      createdAt: sortby === "asc" ? -1 : 1
+    }
+  })
+
+  // apply pagination
+  pipeline.push({
+    $limit: limit
+  }, {
+    $skip: skip
+  })
+
+  const blogs = await Blog.aggregate(pipeline);
+
+  if(!blogs){
+    return res.status(400).json({
+      success: false,
+      message: "Failed to fetch blogs",
+    })
+  }
+
+  res.status(200).json({
+    success: true,
+    blogs,
+  })
+})
+
 const fetchOneBlog = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -215,4 +276,5 @@ module.exports = {
   updateBlogImage,
   deleteBlog,
   searchBlog,
+  fetchBlogsPipeline,
 };
